@@ -1,3 +1,4 @@
+
 function setup() {
     createCanvas(1000, 600);
 }
@@ -5,6 +6,7 @@ function setup() {
 function draw() {
     background(30);
     drawRoads()
+    drawCar()
 
 }
 // function to make the roads
@@ -41,6 +43,16 @@ function drawRoads() {
   
   text("FASTag", 250, 30);
   text("MANUAL", 410, 30);
+  text("FASTag", 570, 30);
+  text("MANUAL", 730, 30);
 
+}
 
+// Function to make car 
+
+function drawCar(){
+  fill(255, 140, 0);
+  noStroke();
+
+  rect(220, 500, 60, 100, 10);
 }
