@@ -40,6 +40,7 @@ function drawRoads() {
   textAlign(CENTER, CENTER);
   
   text("FASTag", 250, 30);
+  text("MANUAL", 460, 30);
 
 
 }
