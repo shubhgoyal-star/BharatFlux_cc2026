@@ -76,14 +76,35 @@ function spawnCars() {
 
     let randomLane = random(laneX);
 
-    let car = {
-      x: randomLane,
-      y: 650,
-      speed: random(3, 5)
-    };
+    let canSpawn = true;
 
-    cars.push(car);
+    // Check spacing
+    for (let car of cars) {
+
+      if (
+        car.x === randomLane &&
+        car.y > 500
+      ) {
+        canSpawn = false;
+      }
+
+    }
+
+    // Spawn only if enough space
+    if (canSpawn) {
+
+      let car = {
+        x: randomLane,
+        y: 650,
+        speed: random(3, 5)
+      };
+
+      cars.push(car);
+
+    }
+
   }
+
 }
 
 function moveCars() {
