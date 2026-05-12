@@ -1,5 +1,6 @@
 // let carY = 600
 let cars = [];
+let laneTypes = ["FASTag", "MANUAL", "FASTag", "MANUAL"];
 function setup() { 
     createCanvas(1000, 600);
 }
@@ -72,17 +73,21 @@ function spawnCars() {
 
   if (frameCount % 40 === 0) {
 
-    let laneX = [220, 380, 540, 700];
+    let laneData = [
+      { x: 220, lane: 0 },
+      { x: 380, lane: 1 },
+      { x: 540, lane: 2 },
+      { x: 700, lane: 3 }
+    ];
 
-    let randomLane = random(laneX);
+    let randomLane = random(laneData);
 
     let canSpawn = true;
 
-    // Check spacing
     for (let car of cars) {
 
       if (
-        car.x === randomLane &&
+        car.lane === randomLane.lane &&
         car.y > 500
       ) {
         canSpawn = false;
@@ -90,13 +95,13 @@ function spawnCars() {
 
     }
 
-    // Spawn only if enough space
     if (canSpawn) {
 
       let car = {
-        x: randomLane,
+        x: randomLane.x,
         y: 650,
-        speed: random(3, 5)
+        speed: random(3, 5),
+        lane: randomLane.lane
       };
 
       cars.push(car);
@@ -106,15 +111,36 @@ function spawnCars() {
   }
 
 }
-
 function moveCars() {
 
   for (let car of cars) {
-    car.y -= car.speed;
+
+    let laneType = laneTypes[car.lane];
+
+    // Manual lanes slow more near toll
+    if (laneType === "MANUAL" && car.y < 140) {
+
+      car.y -= 1;
+
+    }
+
+    // FASTag lanes smoother
+    else if (laneType === "FASTag" && car.y < 140) {
+
+      car.y -= 3;
+
+    }
+
+    // Normal movement
+    else {
+
+      car.y -= car.speed;
+
+    }
+
   }
 
 }
-
 function displayCars() {
 
   for (let car of cars) {
