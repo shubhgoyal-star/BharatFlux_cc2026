@@ -1,12 +1,16 @@
-let carY = 600
-function setup() {
+// let carY = 600
+let cars = [];
+function setup() { 
     createCanvas(1000, 600);
 }
 
 function draw() {
     background(30);
     drawRoads()
-    drawCar()
+    // drawCar()
+    spawnCars();
+    moveCars();
+    displayCars();
 
 }
 // function to make the roads
@@ -50,16 +54,55 @@ function drawRoads() {
 
 // Function to make car 
 
-function drawCar(){
-  fill(255, 140, 0);
-  noStroke();
+// function drawCar(){
+//   fill(255, 140, 0);
+//   noStroke();
 
-  rect(220, carY, 60, 100, 10);
-//   Condition to move the car 
-  carY = carY-3;
+//   rect(220, carY, 60, 100, 10);
+// //   Condition to move the car 
+//   carY = carY-3;
 
-// Condition to start the car from 600 again 
-    if(carY<-100){
-        carY = 600
-    }
+// // Condition to start the car from 600 again 
+//     if(carY<-100){
+//         carY = 600
+//     }
+// }
+
+function spawnCars() {
+
+  if (frameCount % 40 === 0) {
+
+    let laneX = [220, 380, 540, 700];
+
+    let randomLane = random(laneX);
+
+    let car = {
+      x: randomLane,
+      y: 650,
+      speed: random(3, 5)
+    };
+
+    cars.push(car);
+  }
+}
+
+function moveCars() {
+
+  for (let car of cars) {
+    car.y -= car.speed;
+  }
+
+}
+
+function displayCars() {
+
+  for (let car of cars) {
+
+    fill(255, 140, 0);
+    noStroke();
+
+    rect(car.x, car.y, 60, 100, 10);
+
+  }
+
 }
