@@ -21,7 +21,7 @@ function drawRoads() {
   rect(660, 0, 140, 600);
 //   line to divide the road 
   stroke(255);
-  strokeWeight(2);
+  strokeWeight(5);
 
   line(340, 0, 340, 600);
   line(500, 0, 500, 600);
