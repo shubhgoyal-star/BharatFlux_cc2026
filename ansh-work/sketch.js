@@ -56,5 +56,10 @@ function drawCar(){
 
   rect(220, carY, 60, 100, 10);
 //   Condition to move the car 
-  carY = carY-1;
+  carY = carY-3;
+
+// Condition to start the car from 600 again 
+    if(carY<-100){
+        carY = 600
+    }
 }
