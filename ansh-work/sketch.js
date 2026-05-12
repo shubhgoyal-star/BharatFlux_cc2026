@@ -25,4 +25,21 @@ function drawRoads() {
 
   line(340, 0, 340, 600);
   line(500, 0, 500, 600);
-  line(660, 0, 660, 600);}
+  line(660, 0, 660, 600);
+  fill(15, 107, 62);
+  noStroke();
+// making the hording / rectangular heading  of toll 
+  rect(180, 0, 140, 60);
+  rect(340, 0, 140, 60);
+  rect(500, 0, 140, 60);
+  rect(660, 0, 140, 60);
+
+  //   this will add the text on the hording 
+  fill(255);
+  textSize(22);
+  textAlign(CENTER, CENTER);
+  
+  text("FASTag", 250, 30);
+
+
+}
