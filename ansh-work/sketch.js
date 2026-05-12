@@ -46,10 +46,33 @@ function drawRoads() {
   textSize(22);
   textAlign(CENTER, CENTER);
   
-  text("FASTag", 250, 30);
-  text("MANUAL", 410, 30);
-  text("FASTag", 570, 30);
-  text("MANUAL", 730, 30);
+//   text("FASTag", 250, 30);
+//   text("MANUAL", 410, 30);
+//   text("FASTag", 570, 30);
+//   text("MANUAL", 730, 30);
+
+//  Barrier 
+stroke(255, 0, 0);
+strokeWeight(6);
+
+// Lane 1
+line(200, 80, 300, 80);
+
+// Lane 2
+line(360, 80, 460, 80);
+
+// Lane 3
+line(520, 80, 620, 80);
+
+// Lane 4
+line(680, 80, 780, 80);
+let laneTextX = [250, 410, 570, 730];
+
+for (let i = 0; i < 4; i++) {
+
+text(laneTypes[i], laneTextX[i], 30);
+
+}
 
 }
 
