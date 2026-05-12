@@ -1,4 +1,4 @@
-
+let carY = 600
 function setup() {
     createCanvas(1000, 600);
 }
@@ -54,5 +54,7 @@ function drawCar(){
   fill(255, 140, 0);
   noStroke();
 
-  rect(220, 500, 60, 100, 10);
+  rect(220, carY, 60, 100, 10);
+//   Condition to move the car 
+  carY = carY-1;
 }
