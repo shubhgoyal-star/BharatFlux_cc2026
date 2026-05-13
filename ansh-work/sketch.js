@@ -8,6 +8,10 @@ let barrierAngles = [0, 0, 0, 0];
 let currentAngles = [0, 0, 0, 0]; // For smooth animation
 let tollMessages = ["Scanner Error!", "Cash Issue!", "FASTag Invalid!"];
 
+// New Audio assignment (Friend's logic to prevent loading hang)
+let horn1 = new Audio('horn1.mp3'); 
+let horn2 = new Audio('horn2.mp3');
+
 function setup() { 
 
     createCanvas(1000, 600);
@@ -96,22 +100,21 @@ function drawRoads() {
 
   line(660, 0, 660, 600);
 
-  // BETTER UI: Main structural hoarding support
-  fill(80);
-  rect(170, 0, 10, 600); // Left pillar
-  rect(800, 0, 10, 600); // Right pillar
+  // Added structural pillars for UI
+  fill(100);
+  rect(175, 0, 10, 600);
+  rect(800, 0, 10, 600);
 
   fill(15, 107, 62);
 
   noStroke();
 
   // making the hording / rectangular heading  of toll 
-
-  // Visual improvement: Adding a shadow/depth effect to hoarding
-  fill(10, 70, 40);
-  rect(180, 5, 620, 60); 
+  fill(10, 70, 40); // Depth shadow for UI
+  rect(180, 5, 625, 60);
 
   fill(15, 107, 62);
+
   rect(180, 0, 140, 60);
 
   rect(340, 0, 140, 60);
@@ -141,43 +144,43 @@ function drawRoads() {
   let laneTextX = [250, 410, 570, 730];
 
   for (let i = 0; i < 4; i++) {
-    // Styling the labels
-    if(laneTypes[i] === "FASTag") fill(0, 255, 255);
-    else fill(255, 255, 0);
-    
+  
+    if(laneTypes[i] === "FASTag") fill(100, 255, 255);
+    else fill(255, 255, 100);
+
     text(laneTypes[i], laneTextX[i], 30);
   
   }
 
   //  Barrier 
 
-  let barrierX = [250, 410, 570, 730];
+  // CHANGED: Pivot points for realistic side rotation
+  let barrierPivotX = [185, 345, 505, 665];
 
   for (let i = 0; i < 4; i++) {
-    // Smooth animation logic
-    currentAngles[i] = lerp(currentAngles[i], barrierAngles[i], 0.1);
 
-    push();
-    translate(barrierX[i], 80);
-    
-    // Barrier Base/Post
-    fill(100);
-    noStroke();
-    rect(-10, -10, 20, 20);
+  currentAngles[i] = lerp(currentAngles[i], barrierAngles[i], 0.1);
 
-    rotate(radians(currentAngles[i]));
+  push();
 
-    // Barrier Arm (Striped look)
-    strokeWeight(8);
-    stroke(255);
-    line(0, 0, 75, 0);
-    stroke(255, 0, 0);
-    drawingContext.setLineDash([10, 10]);
-    line(5, 0, 70, 0);
-    drawingContext.setLineDash([]); // reset dash
+  translate(barrierPivotX[i], 80);
 
-    pop();
-  }
+  rotate(radians(currentAngles[i]));
+
+  stroke(255);
+
+  strokeWeight(6);
+
+  line(0, 0, 130, 0); // Barrier Arm
+  
+  stroke(200, 0, 0);
+  drawingContext.setLineDash([15, 15]);
+  line(10, 0, 120, 0); // Stripes
+  drawingContext.setLineDash([]);
+
+  pop();
+
+}
 
 }
 
@@ -219,13 +222,13 @@ function spawnCars() {
 
     let laneData = [
 
-      { x: 220, lane: 0 },
+      { x: 250, lane: 0 },
 
-      { x: 380, lane: 1 },
+      { x: 410, lane: 1 },
 
-      { x: 540, lane: 2 },
+      { x: 570, lane: 2 },
 
-      { x: 700, lane: 3 }
+      { x: 730, lane: 3 }
 
     ];
 
@@ -237,7 +240,7 @@ function spawnCars() {
 
       if (
         car.lane === randomLane.lane &&
-        car.y > 500
+        car.y > 450
       ) {
 
         canSpawn = false;
@@ -247,22 +250,19 @@ function spawnCars() {
     }
 
     if (canSpawn) {
-      // VEHICLE VARIETY LOGIC
+      // VEHICLE TYPE LOGIC
       let typeRoll = random(1);
-      let vType = "CAR";
-      let vW = 60;
-      let vH = 100;
-      let vCol = color(255, 140, 0);
+      let vW = 60, vH = 100, vCol = color(255, 140, 0), vType = "CAR";
 
-      if(typeRoll < 0.2) { 
-        vType = "TRUCK"; vW = 70; vH = 150; vCol = color(100); 
+      if(typeRoll < 0.2) {
+        vW = 75; vH = 160; vCol = color(80, 80, 90); vType = "TRUCK";
       } else if(typeRoll < 0.4) {
-        vType = "BUS"; vW = 65; vH = 130; vCol = color(50, 100, 200);
+        vW = 70; vH = 140; vCol = color(40, 100, 200); vType = "BUS";
       }
 
       let car = {
 
-        x: randomLane.x - (vW-60)/2, // Centering variety
+        x: randomLane.x - vW/2,
 
         y: 650,
 
@@ -290,11 +290,6 @@ function spawnCars() {
 }
 
 function moveCars() {
-  
-  // Reset barriers if no car is near
-  for(let i=0; i<4; i++) {
-     barrierAngles[i] = 0; 
-  }
 
   for (let i = 0; i < cars.length; i++) {
 
@@ -314,7 +309,7 @@ function moveCars() {
         car !== other &&
         car.lane === other.lane &&
         other.y < car.y &&
-        car.y - other.y < (car.h + 20) // Dynamic distance based on vehicle height
+        car.y - other.y < (car.h + 30)
       ) {
 
         targetSpeed = 0;
@@ -331,26 +326,37 @@ function moveCars() {
 
       // Stop near barrier
 
-      if (car.y < 160 && car.y > 90) {
+      if (car.y < 180 && car.y > 90) {
 
         targetSpeed = 0;
-        // barrierAngles controlled by wait timer below
-
+        
         // Wait longer
 
         car.waitTimer++;
+        
+        // NEW SOUND: Horn play logic
+        if (car.waitTimer === 45) {
+            horn1.play().catch(e => console.log("Click to enable sound"));
+        }
 
         // After waiting enough
 
         if (car.waitTimer > 80) {
 
           targetSpeed = 2;
-          barrierAngles[car.lane] = -80; // Fully open
+          
+          // NEW SOUND: Barrier open sound
+          if (barrierAngles[car.lane] !== -90) {
+              horn2.play().catch(e => {});
+          }
+          barrierAngles[car.lane] = -90;
 
         } else {
-          barrierAngles[car.lane] = 0; // Keep closed while waiting
+          barrierAngles[car.lane] = 0;
         }
 
+      } else if (car.y <= 90) {
+          barrierAngles[car.lane] = 0;
       }
 
     }
@@ -361,11 +367,18 @@ function moveCars() {
 
       // Small slow zone
 
-      if (car.y < 160 && car.y > 90) {
+      if (car.y < 200 && car.y > 90) {
 
-        targetSpeed = 2;
-        barrierAngles[car.lane] = -80; // Open for FASTag
+        targetSpeed = 2.5;
+        
+        // NEW SOUND: FASTag barrier open sound
+        if (barrierAngles[car.lane] !== -90) {
+            horn2.play().catch(e => {});
+        }
+        barrierAngles[car.lane] = -90;
 
+      } else if (car.y <= 90) {
+          barrierAngles[car.lane] = 0;
       }
 
     }
@@ -428,27 +441,33 @@ function displayCars() {
 
   for (let car of cars) {
 
-    fill(car.col);
-
-    stroke(0, 50);
-    strokeWeight(2);
-
-    rect(car.x, car.y, car.w, car.h, 8);
+    // SHAPE BETTERMENT (Adding wheels and windows)
+    push();
+    translate(car.x, car.y);
     
-    // Adding windows/details to vehicles
-    fill(200, 230, 255, 200);
-    rect(car.x + 5, car.y + 10, car.w - 10, 20, 2); // Front windshield
+    fill(20);
+    rect(-5, 15, 10, 25); rect(car.w - 5, 15, 10, 25); // Front Wheels
+    rect(-5, car.h - 40, 10, 25); rect(car.w - 5, car.h - 40, 10, 25); // Back Wheels
+
+    fill(car.col);
+    stroke(0, 50);
+    rect(0, 0, car.w, car.h, 12);
+
+    fill(180, 220, 255, 200);
+    rect(5, 10, car.w - 10, 25, 5); // Windshield
+
+    fill(255, 255, 150);
+    ellipse(15, 5, 12, 8); ellipse(car.w - 15, 5, 12, 8); // Headlights
+    pop();
 
     textSize(24);
 
     textAlign(CENTER);
-    
-    noStroke();
-    fill(255);
+
     text(
       car.emoji,
       car.x + car.w/2,
-      car.y - 15
+      car.y - 20
     );
 
   }
