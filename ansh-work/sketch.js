@@ -136,30 +136,45 @@ function spawnCars() {
 }
 function moveCars() {
 
-  for (let car of cars) {
+  for (let i = 0; i < cars.length; i++) {
 
+    let car = cars[i];
     let laneType = laneTypes[car.lane];
 
-    // Manual lanes slow more near toll
+    let targetSpeed = car.speed;
+
+    // Check cars ahead in same lane
+    for (let j = 0; j < cars.length; j++) {
+
+      let other = cars[j];
+
+      if (
+        car !== other &&
+        car.lane === other.lane &&
+        other.y < car.y &&
+        car.y - other.y < 120
+      ) {
+
+        targetSpeed = 0;
+
+      }
+
+    }
+
+    // Toll slowing logic
     if (laneType === "MANUAL" && car.y < 140) {
 
-      car.y -= 1;
+      targetSpeed = min(targetSpeed, 1);
 
     }
 
-    // FASTag lanes smoother
     else if (laneType === "FASTag" && car.y < 140) {
 
-      car.y -= 3;
+      targetSpeed = min(targetSpeed, 3);
 
     }
 
-    // Normal movement
-    else {
-
-      car.y -= car.speed;
-
-    }
+    car.y -= targetSpeed;
 
   }
 
