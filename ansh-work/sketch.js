@@ -216,3 +216,40 @@ function displayCars() {
   }
 
 } 
+function mousePressed() {
+
+  let laneStartX = [180, 340, 500, 660];
+
+  for (let i = 0; i < 4; i++) {
+
+    if (
+      mouseX > laneStartX[i] &&
+      mouseX < laneStartX[i] + 140 &&
+      mouseY > 0 &&
+      mouseY < 60
+    ) {
+
+      toggleLane(i);
+
+    }
+
+  }
+  function toggleLane(laneIndex) {
+
+  if (laneTypes[laneIndex] === "FASTag") {
+
+    laneTypes[laneIndex] = "MANUAL";
+
+  }
+
+  else {
+
+    laneTypes[laneIndex] = "FASTag";
+
+  }
+
+}
+
+}
+
+
