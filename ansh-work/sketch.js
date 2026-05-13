@@ -319,35 +319,46 @@ function moveCars() {
 
     // Emotional reactions
 
-    if (laneType === "FASTag" && car.waitTimer < 20) {
+    // Emotional reactions affected by temperature
 
-      car.emoji = "🙂";
+let temp = tempSlider.value();
 
-    }
+// Heat increases frustration faster
+let angryLimit = map(temp, 20, 50, 150, 70);
 
-    else if (car.waitTimer > 150) {
+let annoyedLimit = map(temp, 20, 50, 100, 40);
 
-      car.emoji = "🤬";
+let neutralLimit = map(temp, 20, 50, 50, 20);
 
-    }
+if (laneType === "FASTag" && car.waitTimer < 20) {
 
-    else if (car.waitTimer > 100) {
+  car.emoji = "🙂";
 
-      car.emoji = "😡";
+}
 
-    }
+else if (car.waitTimer > angryLimit) {
 
-    else if (car.waitTimer > 50) {
+  car.emoji = "🤬";
 
-      car.emoji = "😐";
+}
 
-    }
+else if (car.waitTimer > annoyedLimit) {
 
-    else {
+  car.emoji = "😡";
 
-      car.emoji = "🙂";
+}
 
-    }
+else if (car.waitTimer > neutralLimit) {
+
+  car.emoji = "😐";
+
+}
+
+else {
+
+  car.emoji = "🙂";
+
+}
 
     car.y -= targetSpeed;
 
