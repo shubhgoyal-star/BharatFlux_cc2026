@@ -121,12 +121,13 @@ function spawnCars() {
 
     if (canSpawn) {
 
-      let car = {
-        x: randomLane.x,
-        y: 650,
-        speed: random(3, 5),
-        lane: randomLane.lane
-      };
+    let car = {
+      x: randomLane.x,
+      y: 650,
+      speed: random(3, 5),
+      lane: randomLane.lane,
+      waitTimer: 0
+};
 
       cars.push(car);
 
@@ -144,7 +145,7 @@ function moveCars() {
 
     let targetSpeed = car.speed;
 
-    // Check cars ahead in same lane
+    // Queue system
     for (let j = 0; j < cars.length; j++) {
 
       let other = cars[j];
@@ -162,16 +163,39 @@ function moveCars() {
 
     }
 
-    // Toll slowing logic
-    if (laneType === "MANUAL" && car.y < 140) {
+    // ===== TOLL STOPPING LOGIC =====
 
-      targetSpeed = min(targetSpeed, 1);
+    // MANUAL lanes
+    if (laneType === "MANUAL") {
+
+      // Stop near barrier
+      if (car.y < 140 && car.y > 90) {
+
+        targetSpeed = 0;
+
+        // Wait longer
+        car.waitTimer++;
+
+        // After waiting enough
+        if (car.waitTimer > 80) {
+
+          targetSpeed = 2;
+
+        }
+
+      }
 
     }
 
-    else if (laneType === "FASTag" && car.y < 140) {
+    // FASTag lanes
+    else if (laneType === "FASTag") {
 
-      targetSpeed = min(targetSpeed, 3);
+      // Small slow zone
+      if (car.y < 140 && car.y > 90) {
+
+        targetSpeed = 2;
+
+      }
 
     }
 
@@ -191,4 +215,4 @@ function displayCars() {
 
   }
 
-}
+} 
