@@ -51,11 +51,19 @@ function drawRoads() {
 //   text("FASTag", 570, 30);
 //   text("MANUAL", 730, 30);
 
+
+// Lane 1
+let laneTextX = [250, 410, 570, 730];
+
+for (let i = 0; i < 4; i++) {
+  
+  text(laneTypes[i], laneTextX[i], 30);
+  
+}
 //  Barrier 
 stroke(255, 0, 0);
 strokeWeight(6);
 
-// Lane 1
 line(200, 80, 300, 80);
 
 // Lane 2
@@ -66,13 +74,6 @@ line(520, 80, 620, 80);
 
 // Lane 4
 line(680, 80, 780, 80);
-let laneTextX = [250, 410, 570, 730];
-
-for (let i = 0; i < 4; i++) {
-
-text(laneTypes[i], laneTextX[i], 30);
-
-}
 
 }
 
