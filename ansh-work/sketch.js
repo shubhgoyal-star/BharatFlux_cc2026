@@ -12,12 +12,10 @@ function setup() {
     densitySlider = createSlider(20, 100, 50);
     densitySlider.position(20, 620);
     densitySlider.size(200);
+
     tempSlider = createSlider(20, 50, 30);
-
     tempSlider.position(260, 620);
-
     tempSlider.size(200);
-    
 
 }
 
@@ -50,6 +48,12 @@ function draw() {
     textSize(18);
 
     textAlign(LEFT);
+
+    text(
+      "Traffic Density : " + densitySlider.value(),
+      20,
+      590
+    );
 
     text(
       "Temperature : " + tempSlider.value() + "°C",
@@ -228,7 +232,9 @@ function spawnCars() {
 
         lane: randomLane.lane,
 
-        waitTimer: 0
+        waitTimer: 0,
+
+        emoji: "🙂"
 
       };
 
@@ -269,7 +275,7 @@ function moveCars() {
 
     }
 
-    // ===== TOLL STOPPING LOGIC =====
+    // TOLL STOPPING LOGIC 
 
     // MANUAL lanes
 
@@ -311,6 +317,38 @@ function moveCars() {
 
     }
 
+    // Emotional reactions
+
+    if (laneType === "FASTag" && car.waitTimer < 20) {
+
+      car.emoji = "🙂";
+
+    }
+
+    else if (car.waitTimer > 150) {
+
+      car.emoji = "🤬";
+
+    }
+
+    else if (car.waitTimer > 100) {
+
+      car.emoji = "😡";
+
+    }
+
+    else if (car.waitTimer > 50) {
+
+      car.emoji = "😐";
+
+    }
+
+    else {
+
+      car.emoji = "🙂";
+
+    }
+
     car.y -= targetSpeed;
 
   }
@@ -330,6 +368,16 @@ function displayCars() {
     noStroke();
 
     rect(car.x, car.y, 60, 100, 10);
+
+    textSize(24);
+
+    textAlign(CENTER);
+
+    text(
+      car.emoji,
+      car.x + 30,
+      car.y - 15
+    );
 
   }
 
