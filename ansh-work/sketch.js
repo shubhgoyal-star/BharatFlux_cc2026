@@ -4,6 +4,9 @@ let cars = [];
 let laneTypes = ["FASTag", "MANUAL", "FASTag", "MANUAL"];
 let densitySlider;
 let tempSlider;
+let barrierAngles = [0, 0, 0, 0];
+let currentAngles = [0, 0, 0, 0]; // For smooth animation
+let tollMessages = ["Scanner Error!", "Cash Issue!", "FASTag Invalid!"];
 
 function setup() { 
 
@@ -93,12 +96,22 @@ function drawRoads() {
 
   line(660, 0, 660, 600);
 
+  // BETTER UI: Main structural hoarding support
+  fill(80);
+  rect(170, 0, 10, 600); // Left pillar
+  rect(800, 0, 10, 600); // Right pillar
+
   fill(15, 107, 62);
 
   noStroke();
 
   // making the hording / rectangular heading  of toll 
 
+  // Visual improvement: Adding a shadow/depth effect to hoarding
+  fill(10, 70, 40);
+  rect(180, 5, 620, 60); 
+
+  fill(15, 107, 62);
   rect(180, 0, 140, 60);
 
   rect(340, 0, 140, 60);
@@ -128,30 +141,43 @@ function drawRoads() {
   let laneTextX = [250, 410, 570, 730];
 
   for (let i = 0; i < 4; i++) {
-  
+    // Styling the labels
+    if(laneTypes[i] === "FASTag") fill(0, 255, 255);
+    else fill(255, 255, 0);
+    
     text(laneTypes[i], laneTextX[i], 30);
   
   }
 
   //  Barrier 
 
-  stroke(255, 0, 0);
+  let barrierX = [250, 410, 570, 730];
 
-  strokeWeight(6);
+  for (let i = 0; i < 4; i++) {
+    // Smooth animation logic
+    currentAngles[i] = lerp(currentAngles[i], barrierAngles[i], 0.1);
 
-  line(200, 80, 300, 80);
+    push();
+    translate(barrierX[i], 80);
+    
+    // Barrier Base/Post
+    fill(100);
+    noStroke();
+    rect(-10, -10, 20, 20);
 
-  // Lane 2
+    rotate(radians(currentAngles[i]));
 
-  line(360, 80, 460, 80);
+    // Barrier Arm (Striped look)
+    strokeWeight(8);
+    stroke(255);
+    line(0, 0, 75, 0);
+    stroke(255, 0, 0);
+    drawingContext.setLineDash([10, 10]);
+    line(5, 0, 70, 0);
+    drawingContext.setLineDash([]); // reset dash
 
-  // Lane 3
-
-  line(520, 80, 620, 80);
-
-  // Lane 4
-
-  line(680, 80, 780, 80);
+    pop();
+  }
 
 }
 
@@ -221,10 +247,22 @@ function spawnCars() {
     }
 
     if (canSpawn) {
+      // VEHICLE VARIETY LOGIC
+      let typeRoll = random(1);
+      let vType = "CAR";
+      let vW = 60;
+      let vH = 100;
+      let vCol = color(255, 140, 0);
+
+      if(typeRoll < 0.2) { 
+        vType = "TRUCK"; vW = 70; vH = 150; vCol = color(100); 
+      } else if(typeRoll < 0.4) {
+        vType = "BUS"; vW = 65; vH = 130; vCol = color(50, 100, 200);
+      }
 
       let car = {
 
-        x: randomLane.x,
+        x: randomLane.x - (vW-60)/2, // Centering variety
 
         y: 650,
 
@@ -234,7 +272,12 @@ function spawnCars() {
 
         waitTimer: 0,
 
-        emoji: "🙂"
+        emoji: "🙂",
+        
+        type: vType,
+        w: vW,
+        h: vH,
+        col: vCol
 
       };
 
@@ -247,6 +290,11 @@ function spawnCars() {
 }
 
 function moveCars() {
+  
+  // Reset barriers if no car is near
+  for(let i=0; i<4; i++) {
+     barrierAngles[i] = 0; 
+  }
 
   for (let i = 0; i < cars.length; i++) {
 
@@ -266,7 +314,7 @@ function moveCars() {
         car !== other &&
         car.lane === other.lane &&
         other.y < car.y &&
-        car.y - other.y < 120
+        car.y - other.y < (car.h + 20) // Dynamic distance based on vehicle height
       ) {
 
         targetSpeed = 0;
@@ -283,9 +331,10 @@ function moveCars() {
 
       // Stop near barrier
 
-      if (car.y < 140 && car.y > 90) {
+      if (car.y < 160 && car.y > 90) {
 
         targetSpeed = 0;
+        // barrierAngles controlled by wait timer below
 
         // Wait longer
 
@@ -296,7 +345,10 @@ function moveCars() {
         if (car.waitTimer > 80) {
 
           targetSpeed = 2;
+          barrierAngles[car.lane] = -80; // Fully open
 
+        } else {
+          barrierAngles[car.lane] = 0; // Keep closed while waiting
         }
 
       }
@@ -309,9 +361,10 @@ function moveCars() {
 
       // Small slow zone
 
-      if (car.y < 140 && car.y > 90) {
+      if (car.y < 160 && car.y > 90) {
 
         targetSpeed = 2;
+        barrierAngles[car.lane] = -80; // Open for FASTag
 
       }
 
@@ -321,44 +374,45 @@ function moveCars() {
 
     // Emotional reactions affected by temperature
 
-let temp = tempSlider.value();
+    let temp = tempSlider.value();
 
-// Heat increases frustration faster
-let angryLimit = map(temp, 20, 50, 150, 70);
+    // Heat increases frustration faster
 
-let annoyedLimit = map(temp, 20, 50, 100, 40);
+    let angryLimit = map(temp, 20, 50, 150, 70);
 
-let neutralLimit = map(temp, 20, 50, 50, 20);
+    let annoyedLimit = map(temp, 20, 50, 100, 40);
 
-if (laneType === "FASTag" && car.waitTimer < 20) {
+    let neutralLimit = map(temp, 20, 50, 50, 20);
 
-  car.emoji = "🙂";
+    if (laneType === "FASTag" && car.waitTimer < 20) {
 
-}
+      car.emoji = "🙂";
 
-else if (car.waitTimer > angryLimit) {
+    }
 
-  car.emoji = "🤬";
+    else if (car.waitTimer > angryLimit) {
 
-}
+      car.emoji = "🤬";
 
-else if (car.waitTimer > annoyedLimit) {
+    }
 
-  car.emoji = "😡";
+    else if (car.waitTimer > annoyedLimit) {
 
-}
+      car.emoji = "😡";
 
-else if (car.waitTimer > neutralLimit) {
+    }
 
-  car.emoji = "😐";
+    else if (car.waitTimer > neutralLimit) {
 
-}
+      car.emoji = "😐";
 
-else {
+    }
 
-  car.emoji = "🙂";
+    else {
 
-}
+      car.emoji = "🙂";
+
+    }
 
     car.y -= targetSpeed;
 
@@ -366,7 +420,7 @@ else {
 
   // Remove cars after leaving screen
 
-  cars = cars.filter(car => car.y > -120);
+  cars = cars.filter(car => car.y > -200);
 
 }
 
@@ -374,19 +428,26 @@ function displayCars() {
 
   for (let car of cars) {
 
-    fill(255, 140, 0);
+    fill(car.col);
 
-    noStroke();
+    stroke(0, 50);
+    strokeWeight(2);
 
-    rect(car.x, car.y, 60, 100, 10);
+    rect(car.x, car.y, car.w, car.h, 8);
+    
+    // Adding windows/details to vehicles
+    fill(200, 230, 255, 200);
+    rect(car.x + 5, car.y + 10, car.w - 10, 20, 2); // Front windshield
 
     textSize(24);
 
     textAlign(CENTER);
-
+    
+    noStroke();
+    fill(255);
     text(
       car.emoji,
-      car.x + 30,
+      car.x + car.w/2,
       car.y - 15
     );
 
