@@ -23,7 +23,15 @@ function setup() {
 
 function draw() {
 
-    background(30);
+    let temp = tempSlider.value();
+
+    let skyBlue = map(temp, 20, 50, 220, 120);
+
+    let skyGreen = map(temp, 20, 50, 230, 170);
+
+    let skyRed = map(temp, 20, 50, 135, 255);
+
+    background(skyRed, skyGreen, skyBlue);
 
     drawRoads();
 
@@ -44,8 +52,8 @@ function draw() {
     textAlign(LEFT);
 
     text(
-      "Traffic Density : " + densitySlider.value(),
-      20,
+      "Temperature : " + tempSlider.value() + "°C",
+      260,
       590
     );
 
