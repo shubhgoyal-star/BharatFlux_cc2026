@@ -1,20 +1,23 @@
 // let carY = 600
 
 let cars = [];
-
 let laneTypes = ["FASTag", "MANUAL", "FASTag", "MANUAL"];
-
 let densitySlider;
+let tempSlider;
 
 function setup() { 
 
     createCanvas(1000, 600);
 
     densitySlider = createSlider(20, 100, 50);
-
     densitySlider.position(20, 620);
-
     densitySlider.size(200);
+    tempSlider = createSlider(20, 50, 30);
+
+    tempSlider.position(260, 620);
+
+    tempSlider.size(200);
+    
 
 }
 
