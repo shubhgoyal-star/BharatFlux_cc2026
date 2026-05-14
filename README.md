@@ -34,5 +34,7 @@ we wanted to make a traffic simulation based on Indian toll plazas , this projec
 
 Open with live server or run 
 
+## Author:- Shubhdeep Goyal and Ansh Pandya
+
 ```bash
 python -m http.server 8000
